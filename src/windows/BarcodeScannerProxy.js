@@ -280,7 +280,11 @@ module.exports = {
             previewMirroring = capture.getPreviewMirroring();
 
             // Lookup up the rotation degrees.
-            var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring, BarcodeReader.scanCallArgs.args[0].rotateCameraPreview);
+            var rotDegree = videoPreviewRotationLookup(
+                currentOrientation,
+                previewMirroring,
+                BarcodeReader.scanCallArgs.args.length ? BarcodeReader.scanCallArgs.args[0].rotateCameraPreview : undefined,
+            );
 
             capture.setPreviewRotation(degreesToRotation(rotDegree));
             return WinJS.Promise.as();
