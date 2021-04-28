@@ -76,32 +76,32 @@ function findCamera() {
  * @param {Windows.Graphics.Display.DisplayOrientations} displayOrientation
  * @return {Number}
  */
-function videoPreviewRotationLookup(displayOrientation, isMirrored) {
+function videoPreviewRotationLookup(displayOrientation, isMirrored, rotateCameraPreview) {
     var degreesToRotate;
 
     switch (displayOrientation) {
         case Windows.Graphics.Display.DisplayOrientations.landscape:
-            degreesToRotate = 0;
+            degreesToRotate = 0 + (rotateCameraPreview || 0);
             break;
         case Windows.Graphics.Display.DisplayOrientations.portrait:
             if (isMirrored) {
-                degreesToRotate = 270;
+                degreesToRotate = 270 + (rotateCameraPreview || 0);
             } else {
-                degreesToRotate = 90;
+                degreesToRotate = 90 + (rotateCameraPreview || 0);
             }
             break;
         case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
-            degreesToRotate = 180;
+            degreesToRotate = 180 + (rotateCameraPreview || 0);
             break;
         case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
             if (isMirrored) {
-                degreesToRotate = 90;
+                degreesToRotate = 90 + (rotateCameraPreview || 0);
             } else {
-                degreesToRotate = 270;
+                degreesToRotate = 270 + (rotateCameraPreview || 0);
             }
             break;
         default:
-            degreesToRotate = 0;
+            degreesToRotate = 0 + (rotateCameraPreview || 0);
             break;
     }
 
@@ -231,21 +231,16 @@ BarcodeReader.prototype.stop = function () {
 
 function degreesToRotation(degrees) {
     switch (degrees) {
-        // portrait
-        case 90:
-            return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
-        // landscape
         case 0:
             return Windows.Media.Capture.VideoRotation.none;
-        // portrait-flipped
-        case 270:
-            return Windows.Media.Capture.VideoRotation.clockwise270Degrees;
-        // landscape-flipped
+        case 90:
+            return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
         case 180:
             return Windows.Media.Capture.VideoRotation.clockwise180Degrees;
+        case 270:
+            return Windows.Media.Capture.VideoRotation.clockwise270Degrees;
         default:
-            // Falling back to portrait default
-            return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
+            return Windows.Media.Capture.VideoRotation.none;
     }
 }
 
@@ -285,7 +280,7 @@ module.exports = {
             previewMirroring = capture.getPreviewMirroring();
 
             // Lookup up the rotation degrees.
-            var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
+            var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring, BarcodeReader.scanCallArgs.args.rotateCameraPreview);
 
             capture.setPreviewRotation(degreesToRotation(rotDegree));
             return WinJS.Promise.as();
